@@ -30,7 +30,8 @@ export default function HomepageView() {
       fallback: '',
     },
     {
-      imageSrc: 'https://github.com/shadcn.png',
+      imageSrc:
+        'https://static.vecteezy.com/system/resources/previews/019/896/012/non_2x/female-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png',
       fallback: '',
     },
     {
@@ -209,12 +210,28 @@ export default function HomepageView() {
   };
 
   const [selectedSkipData, setSelectedSkipData] = React.useState<SkipDetails>(sampleData[0]);
-  const onSelectCard = (skipData: SkipDetails) => {
+
+  const [showModal, setShowModal] = React.useState(false);
+  const [isFilterSectionOpen, setIsSectionFilterOpen] = React.useState(true);
+  const [showDrawer, setShowDrawer] = React.useState(false);
+  const onClickViewDetails = (skipData: SkipDetails) => {
     setSelectedSkipData(skipData);
     setShowModal(true);
   };
-  const [showModal, setShowModal] = React.useState(false);
-  const [isFilterSectionOpen, setIsSectionFilterOpen] = React.useState(false);
+
+  const onSelectCard = (skipData: SkipDetails) => {
+    setSelectedSkipData(skipData);
+    setShowDrawer(true);
+  };
+
+  const [privateVal, setPrivateVal] = React.useState(false);
+  const [isAllowed, setIsAllowed] = React.useState(false);
+  const [minValue, setMinValue] = React.useState(0);
+  const [maxValue, setMaxValue] = React.useState(0);
+  const filteredResults = sampleData
+    .filter((data) => data.allows_heavy_waste == privateVal)
+    .filter((data) => data.allowed_on_road == isAllowed);
+
   return (
     <div className="container mx-auto px-4 pt-20">
       <div className="mb-8 w-full md:w-4/5 lg:w-3/5">
@@ -239,7 +256,19 @@ export default function HomepageView() {
 
           <p className="text-sm">34 of 43 products</p>
         </div>
-        {isFilterSectionOpen && <Filter className="animate-slideTop sm:hidden" />}
+        {isFilterSectionOpen && (
+          <Filter
+            isAllowed={isAllowed}
+            setIsAllowed={setIsAllowed}
+            privateVal={privateVal}
+            onPrivateValChange={setPrivateVal}
+            className="animate-slideTop sm:hidden"
+            minValue={minValue}
+            setMinValue={setMinValue}
+            maxValue={maxValue}
+            setMaxValue={setMaxValue}
+          />
+        )}
         <div className="flex w-full flex-col space-y-4 md:w-1/2 md:flex-row md:justify-between md:space-y-0 lg:w-3/4">
           <div className="flex w-full items-center space-x-3 border-b-2 pb-2 pr-0 md:w-auto md:pr-12">
             <label htmlFor="search">
@@ -266,7 +295,19 @@ export default function HomepageView() {
       </div>
 
       <div className="flex flex-col items-start sm:space-y-10 lg:flex-row lg:space-x-10 lg:space-y-0">
-        {isFilterSectionOpen && <Filter className="w-full max-sm:hidden lg:w-1/4" />}
+        {isFilterSectionOpen && (
+          <Filter
+            isAllowed={isAllowed}
+            setIsAllowed={setIsAllowed}
+            privateVal={privateVal}
+            onPrivateValChange={setPrivateVal}
+            minValue={minValue}
+            setMinValue={setMinValue}
+            maxValue={maxValue}
+            setMaxValue={setMaxValue}
+            className="w-full max-sm:hidden lg:w-1/4"
+          />
+        )}
 
         <div className={`flex w-full pb-40 ${isFilterSectionOpen ? 'lg:w-3/4' : 'lg:w-full'} `}>
           <div className="flex w-full grid-cols-1 gap-4 max-sm:flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3">
@@ -275,16 +316,18 @@ export default function HomepageView() {
               tags={['Waste Logistics', 'Transport', 'Intermodal Waste Logistics']}
               hasImage
               skipDetails={customSkipDetail}
-              onClickViewDetails={() => onSelectCard(customSkipDetail)}
+              onClickViewDetails={() => onClickViewDetails(customSkipDetail)}
+              onSelect={() => onSelectCard(customSkipDetail)}
             />
-            {sampleData.map((data, i) => (
+            {filteredResults.map((data, i) => (
               <Card
                 key={data.id || i}
                 description="Book online with transparent pricing and assured loading every time."
                 tags={['Waste Logistics', 'Transport']}
                 hasImage={false}
                 skipDetails={data}
-                onClickViewDetails={() => onSelectCard(data)}
+                onClickViewDetails={() => onClickViewDetails(data)}
+                onSelect={() => onSelectCard(data)}
               />
             ))}
           </div>
@@ -297,6 +340,24 @@ export default function HomepageView() {
           setShowModal={setShowModal}
         />
       </div>
+      {showDrawer && (
+        <div className="fixed bottom-0 left-0 w-screen animate-slideTop border-t-2 border-solid border-gray-200 bg-white py-4">
+          <div className="container mx-auto flex items-center justify-between">
+            <div className="flex items-end gap-2">
+              <p className="text-3xl font-bold">£{selectedSkipData.price_before_vat}</p>
+              <p>per week</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <button className="rounded-md bg-sky-950 px-4 py-2 text-sm text-white duration-300 hover:bg-sky-900">
+                Back
+              </button>
+              <button className="rounded-md border border-solid border-gray-400 px-4 py-2 text-sm duration-300 hover:bg-gray-200">
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

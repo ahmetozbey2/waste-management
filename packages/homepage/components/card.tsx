@@ -38,6 +38,7 @@ export interface CardProps {
    */
   skipDetails: Pick<SkipDetails, 'id' | 'size' | 'price_before_vat'>;
   onClickViewDetails: () => void;
+  onSelect: () => void;
 }
 
 /**
@@ -51,7 +52,7 @@ export interface CardProps {
  *
  * @returns A styled card displaying skip details and call-to-action buttons.
  */
-export default function Card({ hasImage, tags, skipDetails, onClickViewDetails }: CardProps) {
+export default function Card({ hasImage, tags, skipDetails, onClickViewDetails, onSelect }: CardProps) {
   return (
     <div
       className={`${hasImage ? 'col-span-2' : 'col-span-1'} flex items-start gap-4 rounded-xl border border-solid border-gray-400 p-5 max-sm:flex-col`}>
@@ -97,7 +98,9 @@ export default function Card({ hasImage, tags, skipDetails, onClickViewDetails }
 
         {/* Action buttons */}
         <div className="flex items-center space-x-3">
-          <button className="rounded-md bg-sky-950 px-4 py-2 text-sm text-white duration-300 hover:bg-sky-900">
+          <button
+            onClick={onSelect}
+            className="rounded-md bg-sky-950 px-4 py-2 text-sm text-white duration-300 hover:bg-sky-900">
             Select
           </button>
           <button
