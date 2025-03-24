@@ -228,9 +228,19 @@ export default function HomepageView() {
   const [isAllowed, setIsAllowed] = React.useState(false);
   const [minValue, setMinValue] = React.useState(0);
   const [maxValue, setMaxValue] = React.useState(0);
+  const [searchTerm, setSearchTerm] = React.useState('');
   const filteredResults = sampleData
-    .filter((data) => data.allows_heavy_waste == privateVal)
-    .filter((data) => data.allowed_on_road == isAllowed);
+    .filter((data) => data.allows_heavy_waste === privateVal)
+    .filter((data) => data.allowed_on_road === isAllowed)
+    .filter((data) => {
+      const lowerSearch = searchTerm.toLowerCase();
+      return (
+        data.postcode?.toLowerCase().includes(lowerSearch) ||
+        data.size.toString().includes(lowerSearch) ||
+        data.price_before_vat.toString().includes(lowerSearch) ||
+        data.size.toString().includes(lowerSearch)
+      );
+    });
 
   return (
     <div className="container mx-auto px-4 pt-20">
@@ -279,6 +289,8 @@ export default function HomepageView() {
               type="text"
               placeholder="What are you looking for ?"
               className="w-full focus:outline-none"
+              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchTerm}
             />
           </div>
           <div className="flex items-center space-x-4 md:space-x-6">
