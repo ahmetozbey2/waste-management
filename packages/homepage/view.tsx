@@ -204,31 +204,40 @@ export default function HomepageView() {
     allows_heavy_waste: false,
   };
   return (
-    <div className="container mx-auto pt-20">
-      <div className="mb-8 w-3/5">
-        <h1 className="mb-3 text-[40px] leading-[45px]">Choose your preferred skip size now</h1>
+    <div className="container mx-auto px-4 pt-20">
+      <div className="mb-8 w-full md:w-4/5 lg:w-3/5">
+        <h1 className="mb-3 text-3xl leading-tight md:text-[40px] md:leading-[45px]">
+          Choose your preferred skip size now
+        </h1>
         <p className="mb-6">Select the skip size that best suits your needs</p>
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-x-2 sm:space-y-0">
           <AvatarContainer avatars={avatars} />
           <p className="text-sm italic text-gray-500">Trusted by more than 100,000 customers worldwide.</p>
         </div>
       </div>
-      <div className="bg-orange-60 mb-10 flex items-center space-x-10">
-        <div className="flex w-1/4 items-center space-x-4">
+
+      <div className="bg-orange-60 mb-10 flex flex-col space-y-4 lg:flex-row lg:items-center lg:space-x-10 lg:space-y-0">
+        <div className="flex w-full items-center space-x-4 md:w-1/2 lg:w-1/4">
           <div className="flex w-fit cursor-pointer items-center space-x-2 rounded-md border border-solid border-gray-400 px-4 py-2 duration-300 hover:bg-gray-300">
             <p>Filter</p>
             <BsFilterLeft size={20} />
           </div>
-          <p>34 of 43 products</p>
+          <p className="text-sm">34 of 43 products</p>
         </div>
-        <div className="flex w-3/4 justify-between">
-          <div className="flex w-fit items-center space-x-3 border-b-2 pb-2 pr-12">
+
+        <div className="flex w-full flex-col space-y-4 md:w-1/2 md:flex-row md:justify-between md:space-y-0 lg:w-3/4">
+          <div className="flex w-full items-center space-x-3 border-b-2 pb-2 pr-0 md:w-auto md:pr-12">
             <label htmlFor="search">
               <IoIosSearch size={20} />
             </label>
-            <input id="search" type="text" placeholder="What are you looking for ?" className="focus:outline-none" />
+            <input
+              id="search"
+              type="text"
+              placeholder="What are you looking for ?"
+              className="w-full focus:outline-none"
+            />
           </div>
-          <div className="flex items-center space-x-12">
+          <div className="flex items-center space-x-4 md:space-x-6">
             <div className="flex cursor-pointer items-center space-x-2 rounded-sm px-4 py-2 duration-300 hover:bg-gray-200">
               <p className="text-[#353535]">Favourites</p>
               <IoIosHeartEmpty />
@@ -240,59 +249,41 @@ export default function HomepageView() {
           </div>
         </div>
       </div>
-      <div className="flex items-start space-x-10">
-        <div className="w-1/4">
+
+      <div className="flex flex-col items-start space-y-10 lg:flex-row lg:space-x-10 lg:space-y-0">
+        <div className="w-full lg:w-1/4">
           <h1 className="mb-2">Filter</h1>
           <p className="text-sm italic">Choose your preferred type of service</p>
-          <div className="pt-4">
-            <div className="flex items-center justify-between py-2">
-              <div className="flex items-center space-x-2">
-                <PiTruckLight size={30} />
-                <p className="text-lg">Allowed on Road</p>
+          <div className="space-y-4 pt-4">
+            {[1, 2, 3, 4].map((_, idx) => (
+              <div key={idx} className="flex items-center justify-between py-2">
+                <div className="flex items-center space-x-2">
+                  <PiTruckLight size={30} />
+                  <p className="text-lg">Allowed on Road</p>
+                </div>
+                <input type="checkbox" className="size-5" />
               </div>
-              <input type="checkbox" className="size-5" />
-            </div>
-            <div className="flex items-center justify-between py-2">
-              <div className="flex items-center space-x-2">
-                <PiTruckLight size={30} />
-                <p className="text-lg">Allowed on Road</p>
-              </div>
-              <input type="checkbox" className="size-5" />
-            </div>
-            <div className="flex items-center justify-between py-2">
-              <div className="flex items-center space-x-2">
-                <PiTruckLight size={30} />
-                <p className="text-lg">Allowed on Road</p>
-              </div>
-              <input type="checkbox" className="size-5" />
-            </div>
-            <div className="flex items-center justify-between py-2">
-              <div className="flex items-center space-x-2">
-                <PiTruckLight size={30} />
-                <p className="text-lg">Allowed on Road</p>
-              </div>
-              <input type="checkbox" className="size-5" />
-            </div>
+            ))}
           </div>
         </div>
-        <div className="flex w-3/4">
-          <div className="grid w-full grid-cols-3  gap-4">
+
+        <div className="flex w-full pb-40 lg:w-3/4">
+          <div className="flex w-full grid-cols-1 gap-4 max-sm:flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3">
             <Card
               description="Book online with transparent pricing and assured loading every time."
-              tags={['Waste Logistics', 'Transport']}
+              tags={['Waste Logistics', 'Transport', 'Tracking & Traceability of Waste Loads']}
               hasImage
               skipDetails={customSkipDetail}
             />
-            {sampleData.map((data, i) => {
-              return (
-                <Card
-                  description="Book online with transparent pricing and assured loading every time."
-                  tags={['Waste Logistics', 'Transport']}
-                  hasImage={false}
-                  skipDetails={data}
-                />
-              );
-            })}
+            {sampleData.map((data, i) => (
+              <Card
+                key={data.id || i}
+                description="Book online with transparent pricing and assured loading every time."
+                tags={['Waste Logistics', 'Transport']}
+                hasImage={false}
+                skipDetails={data}
+              />
+            ))}
           </div>
         </div>
       </div>

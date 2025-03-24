@@ -5,11 +5,11 @@
  * Each avatar can include an image and a fallback text if the image fails to load.
  */
 
-import * as React from "react";
+import * as React from 'react';
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-import type { AvatarProps } from "../helpers/types";
+import type { AvatarProps } from '../helpers/types';
 
 export interface AvatarContainerProps {
   avatars: Array<AvatarProps>;

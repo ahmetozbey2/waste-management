@@ -8,11 +8,11 @@
  * If the `hasImage` prop is true, the component also displays a preview image alongside the content.
  *
  */
-import Image from "next/image";
-import * as React from "react";
-import { IoIosHeartEmpty } from "react-icons/io";
+import Image from 'next/image';
+import * as React from 'react';
+import { IoIosHeartEmpty } from 'react-icons/io';
 
-import type { SkipDetails } from "../helpers/types";
+import type { SkipDetails } from '../helpers/types';
 
 /**
  * Props for the Card component.
@@ -36,7 +36,7 @@ export interface CardProps {
   /**
    * Skip details including ID, size, and price before VAT.
    */
-  skipDetails: Pick<SkipDetails, "id" | "size" | "price_before_vat">;
+  skipDetails: Pick<SkipDetails, 'id' | 'size' | 'price_before_vat'>;
 }
 
 /**
@@ -53,7 +53,7 @@ export interface CardProps {
 export default function Card({ hasImage, description, tags, skipDetails }: CardProps) {
   return (
     <div
-      className={`${hasImage ? "col-span-2" : "col-span-1"} flex items-start gap-4 rounded-xl border border-solid border-gray-400 p-5`}>
+      className={`${hasImage ? 'col-span-2' : 'col-span-1'} flex items-start gap-4 rounded-xl border border-solid border-gray-400 p-5 max-sm:flex-col`}>
       {/* Conditional image section */}
       {hasImage && (
         <Image
