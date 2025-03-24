@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { BsFilterLeft } from 'react-icons/bs';
 import { CiCircleList } from 'react-icons/ci';
@@ -6,7 +8,8 @@ import { PiTruckLight } from 'react-icons/pi';
 
 import AvatarContainer from './components/avatarContainer';
 import Card from './components/card';
-import type { AvatarProps } from './helpers/types';
+import { DetailModal } from './components/detailModal';
+import type { AvatarProps, SkipDetails } from './helpers/types';
 
 export default function HomepageView() {
   const avatars: Array<AvatarProps> = [
@@ -203,6 +206,13 @@ export default function HomepageView() {
     allowed_on_road: false,
     allows_heavy_waste: false,
   };
+
+  const [selectedSkipData, setSelectedSkipData] = React.useState<SkipDetails>(sampleData[0]);
+  const onSelectCard = (skipData: SkipDetails) => {
+    setSelectedSkipData(skipData);
+    setShowModal(true);
+  };
+  const [showModal, setShowModal] = React.useState(false);
   return (
     <div className="container mx-auto px-4 pt-20">
       <div className="mb-8 w-full md:w-4/5 lg:w-3/5">
@@ -254,16 +264,21 @@ export default function HomepageView() {
         <div className="w-full lg:w-1/4">
           <h1 className="mb-2">Filter</h1>
           <p className="text-sm italic">Choose your preferred type of service</p>
-          <div className="space-y-4 pt-4">
-            {[1, 2, 3, 4].map((_, idx) => (
-              <div key={idx} className="flex items-center justify-between py-2">
-                <div className="flex items-center space-x-2">
-                  <PiTruckLight size={30} />
-                  <p className="text-lg">Allowed on Road</p>
-                </div>
-                <input type="checkbox" className="size-5" />
+          <div className="space-y-2 pt-4">
+            <div className="flex items-center justify-between py-1">
+              <div className="flex items-center space-x-2">
+                <PiTruckLight size={30} />
+                <p className="text-lg">Allowed on Road</p>
               </div>
-            ))}
+              <input type="checkbox" className="size-5" />
+            </div>
+            <div className="flex items-center justify-between py-1">
+              <div className="flex items-center space-x-2">
+                <PiTruckLight size={30} />
+                <p className="text-lg">Private Property Only</p>
+              </div>
+              <input type="checkbox" className="size-5" />
+            </div>
           </div>
         </div>
 
@@ -271,9 +286,10 @@ export default function HomepageView() {
           <div className="flex w-full grid-cols-1 gap-4 max-sm:flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3">
             <Card
               description="Book online with transparent pricing and assured loading every time."
-              tags={['Waste Logistics', 'Transport', 'Tracking & Traceability of Waste Loads']}
+              tags={['Waste Logistics', 'Transport', 'Intermodal Waste Logistics']}
               hasImage
               skipDetails={customSkipDetail}
+              onClickViewDetails={() => onSelectCard(customSkipDetail)}
             />
             {sampleData.map((data, i) => (
               <Card
@@ -282,10 +298,18 @@ export default function HomepageView() {
                 tags={['Waste Logistics', 'Transport']}
                 hasImage={false}
                 skipDetails={data}
+                onClickViewDetails={() => onSelectCard(data)}
               />
             ))}
           </div>
         </div>
+
+        <DetailModal
+          skipDetails={selectedSkipData}
+          tags={['Waste Logistics', 'Transport']}
+          showModal={showModal}
+          setShowModal={setShowModal}
+        />
       </div>
     </div>
   );

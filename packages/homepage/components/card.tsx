@@ -3,7 +3,7 @@
  * @description
  * This file exports the `Card` React component, which is used to visually present information
  * about a skip product (such as a waste container). It displays details including the skip size,
- * price, related tags, and a call-to-action section with buttons like "Pay Now" and "View Details".
+ * price, related tags, and a call-to-action section with buttons like "Select" and "View Details".
  *
  * If the `hasImage` prop is true, the component also displays a preview image alongside the content.
  *
@@ -37,6 +37,7 @@ export interface CardProps {
    * Skip details including ID, size, and price before VAT.
    */
   skipDetails: Pick<SkipDetails, 'id' | 'size' | 'price_before_vat'>;
+  onClickViewDetails: () => void;
 }
 
 /**
@@ -50,7 +51,7 @@ export interface CardProps {
  *
  * @returns A styled card displaying skip details and call-to-action buttons.
  */
-export default function Card({ hasImage, description, tags, skipDetails }: CardProps) {
+export default function Card({ hasImage, tags, skipDetails, onClickViewDetails }: CardProps) {
   return (
     <div
       className={`${hasImage ? 'col-span-2' : 'col-span-1'} flex items-start gap-4 rounded-xl border border-solid border-gray-400 p-5 max-sm:flex-col`}>
@@ -97,9 +98,11 @@ export default function Card({ hasImage, description, tags, skipDetails }: CardP
         {/* Action buttons */}
         <div className="flex items-center space-x-3">
           <button className="rounded-md bg-sky-950 px-4 py-2 text-sm text-white duration-300 hover:bg-sky-900">
-            Pay Now
+            Select
           </button>
-          <button className="rounded-md border border-solid border-gray-400 px-4 py-2 text-sm duration-300 hover:bg-gray-200">
+          <button
+            onClick={onClickViewDetails}
+            className="rounded-md border border-solid border-gray-400 px-4 py-2 text-sm duration-300 hover:bg-gray-200">
             View Details
           </button>
         </div>
