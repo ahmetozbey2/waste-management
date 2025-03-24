@@ -77,6 +77,9 @@ export function DetailModal({ skipDetails, tags, showModal, setShowModal }: Deta
             <PiShippingContainer size={30} />
             <p>Get notified when skips are available near you</p>{' '}
           </div>
+          <button className="mt-5 w-fit rounded-md bg-sky-950 px-8 py-3 text-sm text-white duration-300 hover:bg-sky-900">
+            Select
+          </button>
         </div>
         <DialogClose asChild>
           <button

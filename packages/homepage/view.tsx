@@ -4,42 +4,43 @@ import * as React from 'react';
 import { BsFilterLeft } from 'react-icons/bs';
 import { CiCircleList } from 'react-icons/ci';
 import { IoIosHeartEmpty, IoIosSearch } from 'react-icons/io';
-import { PiTruckLight } from 'react-icons/pi';
 
 import AvatarContainer from './components/avatarContainer';
 import Card from './components/card';
 import { DetailModal } from './components/detailModal';
+import Filter from './components/filter';
 import type { AvatarProps, SkipDetails } from './helpers/types';
 
 export default function HomepageView() {
   const avatars: Array<AvatarProps> = [
     {
-      imageSrc: 'https://github.com/shadcn.png',
-      fallback: 'CN',
+      imageSrc: 'https://icon-library.com/images/avatar-icon-images/avatar-icon-images-4.jpg',
+      fallback: '',
+    },
+    {
+      imageSrc: 'https://icon-library.com/images/avatar-icon-images/avatar-icon-images-6.jpg',
+      fallback: '',
+    },
+    {
+      imageSrc: 'https://cdn1.iconfinder.com/data/icons/avatars-1-5/136/87-512.png',
+      fallback: '',
+    },
+    {
+      imageSrc: 'https://www.svgrepo.com/show/382106/male-avatar-boy-face-man-user-9.svg',
+      fallback: '',
     },
     {
       imageSrc: 'https://github.com/shadcn.png',
-      fallback: 'CN',
+      fallback: '',
     },
     {
-      imageSrc: 'https://github.com/shadcn.png',
-      fallback: 'CN',
+      imageSrc:
+        'https://img.freepik.com/premium-vector/man-avatar-profile-picture-isolated-background-avatar-profile-picture-man_1293239-4841.jpg',
+      fallback: '',
     },
     {
-      imageSrc: 'https://github.com/shadcn.png',
-      fallback: 'CN',
-    },
-    {
-      imageSrc: 'https://github.com/shadcn.png',
-      fallback: 'CN',
-    },
-    {
-      imageSrc: 'https://github.com/shadcn.png',
-      fallback: 'CN',
-    },
-    {
-      imageSrc: 'https://github.com/shadcn.png',
-      fallback: 'CN',
+      imageSrc: 'https://icon-library.com/images/avatar-icon-images/avatar-icon-images-5.jpg',
+      fallback: '',
     },
   ];
 
@@ -213,6 +214,7 @@ export default function HomepageView() {
     setShowModal(true);
   };
   const [showModal, setShowModal] = React.useState(false);
+  const [isFilterSectionOpen, setIsSectionFilterOpen] = React.useState(false);
   return (
     <div className="container mx-auto px-4 pt-20">
       <div className="mb-8 w-full md:w-4/5 lg:w-3/5">
@@ -228,13 +230,16 @@ export default function HomepageView() {
 
       <div className="bg-orange-60 mb-10 flex flex-col space-y-4 lg:flex-row lg:items-center lg:space-x-10 lg:space-y-0">
         <div className="flex w-full items-center space-x-4 md:w-1/2 lg:w-1/4">
-          <div className="flex w-fit cursor-pointer items-center space-x-2 rounded-md border border-solid border-gray-400 px-4 py-2 duration-300 hover:bg-gray-300">
+          <div
+            onClick={() => setIsSectionFilterOpen((prev) => !prev)}
+            className="flex w-fit cursor-pointer items-center space-x-2 rounded-md border border-solid border-gray-400 px-4 py-2 duration-300 hover:bg-gray-300">
             <p>Filter</p>
             <BsFilterLeft size={20} />
           </div>
+
           <p className="text-sm">34 of 43 products</p>
         </div>
-
+        {isFilterSectionOpen && <Filter className="animate-slideTop sm:hidden" />}
         <div className="flex w-full flex-col space-y-4 md:w-1/2 md:flex-row md:justify-between md:space-y-0 lg:w-3/4">
           <div className="flex w-full items-center space-x-3 border-b-2 pb-2 pr-0 md:w-auto md:pr-12">
             <label htmlFor="search">
@@ -248,7 +253,7 @@ export default function HomepageView() {
             />
           </div>
           <div className="flex items-center space-x-4 md:space-x-6">
-            <div className="flex cursor-pointer items-center space-x-2 rounded-sm px-4 py-2 duration-300 hover:bg-gray-200">
+            <div className="flex cursor-pointer items-center space-x-2 rounded-sm py-2 duration-300 hover:bg-gray-200 sm:px-4">
               <p className="text-[#353535]">Favourites</p>
               <IoIosHeartEmpty />
             </div>
@@ -260,29 +265,10 @@ export default function HomepageView() {
         </div>
       </div>
 
-      <div className="flex flex-col items-start space-y-10 lg:flex-row lg:space-x-10 lg:space-y-0">
-        <div className="w-full lg:w-1/4">
-          <h1 className="mb-2">Filter</h1>
-          <p className="text-sm italic">Choose your preferred type of service</p>
-          <div className="space-y-2 pt-4">
-            <div className="flex items-center justify-between py-1">
-              <div className="flex items-center space-x-2">
-                <PiTruckLight size={30} />
-                <p className="text-lg">Allowed on Road</p>
-              </div>
-              <input type="checkbox" className="size-5" />
-            </div>
-            <div className="flex items-center justify-between py-1">
-              <div className="flex items-center space-x-2">
-                <PiTruckLight size={30} />
-                <p className="text-lg">Private Property Only</p>
-              </div>
-              <input type="checkbox" className="size-5" />
-            </div>
-          </div>
-        </div>
+      <div className="flex flex-col items-start sm:space-y-10 lg:flex-row lg:space-x-10 lg:space-y-0">
+        {isFilterSectionOpen && <Filter className="w-full max-sm:hidden lg:w-1/4" />}
 
-        <div className="flex w-full pb-40 lg:w-3/4">
+        <div className={`flex w-full pb-40 ${isFilterSectionOpen ? 'lg:w-3/4' : 'lg:w-full'} `}>
           <div className="flex w-full grid-cols-1 gap-4 max-sm:flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3">
             <Card
               description="Book online with transparent pricing and assured loading every time."
