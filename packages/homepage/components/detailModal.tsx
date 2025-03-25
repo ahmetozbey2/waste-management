@@ -1,14 +1,15 @@
 import Image from 'next/image';
-import { type Dispatch, type SetStateAction } from 'react';
+import React, { type Dispatch, type SetStateAction } from 'react';
 import { AiOutlineRollback } from 'react-icons/ai';
 import { CiEdit } from 'react-icons/ci';
-import { IoIosHeartEmpty } from 'react-icons/io';
+import { IoIosHeart, IoIosHeartEmpty } from 'react-icons/io';
 import { IoAirplaneOutline, IoCloseOutline } from 'react-icons/io5';
 import { LuNotebookPen } from 'react-icons/lu';
 import { PiShippingContainer, PiTruckLight } from 'react-icons/pi';
 
 import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
 
+import { useFavoritesStore } from '../../../store/favoritesState';
 import type { SkipDetails } from '../helpers/types';
 
 interface DetailModalProps {
@@ -22,6 +23,12 @@ export function DetailModal({ skipDetails, tags, showModal, setShowModal, onSele
   if (!skipDetails) {
     return;
   }
+  const { addFavorite, removeFavorite, isFavorite } = useFavoritesStore();
+  const [hasHydrated, setHasHydrated] = React.useState(false);
+
+  React.useEffect(() => {
+    setHasHydrated(true);
+  }, []);
   return (
     <Dialog open={showModal}>
       <DialogContent
@@ -47,7 +54,20 @@ export function DetailModal({ skipDetails, tags, showModal, setShowModal, onSele
           </div>
           {skipDetails.id != 0 && (
             <div className="cursor-pointer rounded-md border border-solid border-gray-400 p-[4px]">
-              <IoIosHeartEmpty size={20} className="cursor-pointer" />
+              {hasHydrated && isFavorite(skipDetails.id) ? (
+                <IoIosHeart
+                  fill="red"
+                  className="cursor-pointer"
+                  size={25}
+                  onClick={() => removeFavorite(skipDetails.id)}
+                />
+              ) : (
+                <IoIosHeartEmpty
+                  className="cursor-pointer"
+                  size={25}
+                  onClick={() => addFavorite(skipDetails as SkipDetails)}
+                />
+              )}
             </div>
           )}
         </div>
