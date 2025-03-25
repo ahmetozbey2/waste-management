@@ -25,3 +25,10 @@ export interface SkipDetails {
   allowed_on_road: boolean;
   allows_heavy_waste: boolean;
 }
+
+export interface FilterState {
+  allows_heavy_waste: boolean;
+  allowed_on_road: boolean;
+  minValue: number;
+  maxValue: number;
+}

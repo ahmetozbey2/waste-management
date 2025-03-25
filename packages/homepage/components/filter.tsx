@@ -11,13 +11,13 @@ import { RangeInputRow } from './rangeInputRow';
 export interface FilterProps {
   className?: string;
   allows_heavy_waste: boolean;
-  onAllowsHeavyWasteValChange: React.Dispatch<React.SetStateAction<boolean>>;
+  onAllowsHeavyWasteValChange: (value: boolean) => void;
   isAllowed: boolean;
-  setIsAllowed: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsAllowed: (value: boolean) => void;
   minValue: number;
-  setMinValue: React.Dispatch<React.SetStateAction<number>>;
+  setMinValue: (value: number) => void;
   maxValue: number;
-  setMaxValue: React.Dispatch<React.SetStateAction<number>>;
+  setMaxValue: (value: number) => void;
 }
 
 /**
