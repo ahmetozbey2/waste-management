@@ -41,6 +41,7 @@ export interface CardProps {
   onClickViewDetails: () => void;
   onSelect: () => void;
   data: SkipDetails;
+  viewType: 'List' | 'Grid';
 }
 
 /**
@@ -54,7 +55,7 @@ export interface CardProps {
  *
  * @returns A styled card displaying skip details and call-to-action buttons.
  */
-export default function Card({ hasImage, tags, skipDetails, onClickViewDetails, onSelect, data }: CardProps) {
+export default function Card({ hasImage, tags, skipDetails, onClickViewDetails, onSelect, data, viewType }: CardProps) {
   const { addFavorite, removeFavorite, isFavorite } = useFavoritesStore();
   const [hasHydrated, setHasHydrated] = React.useState(false);
 
@@ -64,7 +65,7 @@ export default function Card({ hasImage, tags, skipDetails, onClickViewDetails, 
 
   return (
     <div
-      className={`${hasImage ? 'col-span-2' : 'col-span-1'} flex items-start gap-4 rounded-xl border border-solid border-gray-400 p-5 max-sm:flex-col`}>
+      className={`${hasImage ? 'col-span-2 flex' : viewType == 'Grid' ? 'col-span-1 flex ' : 'w-full'}   items-start gap-4 rounded-xl border border-solid border-gray-400 p-5 max-sm:flex-col`}>
       {/* Conditional image section */}
       {hasImage && (
         <Image
@@ -72,13 +73,15 @@ export default function Card({ hasImage, tags, skipDetails, onClickViewDetails, 
           width={400}
           height={400}
           alt=""
-          className="aspect-square w-[45%] rounded-md"
+          className={`aspect-square  rounded-md ${viewType == 'Grid' ? 'w-[45%]' : 'w-[25%]'}`}
         />
       )}
-      <div>
+      <div className="w-full">
         {/* Header section with size and heart icon */}
         <div className="flex justify-between">
-          <p className="mb-1 w-fit rounded-full border border-gray-400 px-4 py-1 text-xs">{skipDetails.size} Yards</p>
+          <p className="mb-1 w-fit rounded-full border border-gray-400 px-4 py-1 text-xs">
+            {skipDetails.id != 0 ? skipDetails.size : '40+'} Yards
+          </p>
           {hasHydrated && isFavorite(data.id) ? (
             <IoIosHeart fill="red" className="cursor-pointer" size={25} onClick={() => removeFavorite(data.id)} />
           ) : (
@@ -87,7 +90,7 @@ export default function Card({ hasImage, tags, skipDetails, onClickViewDetails, 
         </div>
 
         {/* Title and subtitle */}
-        <p className="mb-2 text-lg">{skipDetails.size} Yard Skip</p>
+        <p className="mb-2 text-lg">{!hasImage ? skipDetails.size : 'Custom'} Yard Skip</p>
         <p className="mb-2 text-sm">Book online with transparent pricing and assured loading every time.</p>
 
         {/* Tags section */}
@@ -104,7 +107,7 @@ export default function Card({ hasImage, tags, skipDetails, onClickViewDetails, 
 
         {/* Price display */}
         <div className="mb-3 flex items-end space-x-1">
-          <p className="text-2xl font-semibold">£{skipDetails.price_before_vat}</p>
+          <p className="text-2xl font-semibold">{hasImage ? 'Ask For Price ' : `£${skipDetails.price_before_vat}`}</p>
           <p className="mb-1 text-sm">per week</p>
         </div>
 

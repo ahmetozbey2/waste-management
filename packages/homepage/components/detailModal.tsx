@@ -13,12 +13,15 @@ import type { SkipDetails } from '../helpers/types';
 
 interface DetailModalProps {
   tags: Array<string>;
-  skipDetails: Pick<SkipDetails, 'id' | 'size' | 'price_before_vat'>;
+  skipDetails: Pick<SkipDetails, 'id' | 'size' | 'price_before_vat'> | null;
   showModal: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
   onSelect: () => void;
 }
 export function DetailModal({ skipDetails, tags, showModal, setShowModal, onSelect }: DetailModalProps) {
+  if (!skipDetails) {
+    return;
+  }
   return (
     <Dialog open={showModal}>
       <DialogContent
@@ -39,12 +42,14 @@ export function DetailModal({ skipDetails, tags, showModal, setShowModal, onSele
                 })}
               </div>
 
-              <h1 className="text-xl">{skipDetails.size} Skip</h1>
+              <h1 className="text-xl">{skipDetails?.id != 0 ? skipDetails?.size : 'Custom'} Skip</h1>
             </div>
           </div>
-          <div className="cursor-pointer rounded-md border border-solid border-gray-400 p-[4px]">
-            <IoIosHeartEmpty size={20} className="cursor-pointer" />
-          </div>
+          {skipDetails.id != 0 && (
+            <div className="cursor-pointer rounded-md border border-solid border-gray-400 p-[4px]">
+              <IoIosHeartEmpty size={20} className="cursor-pointer" />
+            </div>
+          )}
         </div>
 
         <p className="text-sm font-light">
@@ -86,7 +91,7 @@ export function DetailModal({ skipDetails, tags, showModal, setShowModal, onSele
         </div>
         <DialogClose asChild>
           <button
-            className="absolute -top-14 right-0 flex size-10 items-center justify-center rounded-full bg-white text-gray-500 transition hover:text-gray-800"
+            className="absolute right-0 flex size-10 items-center justify-center rounded-full bg-white text-gray-500  transition hover:text-gray-800 sm:-top-14"
             onClick={() => setShowModal(false)}>
             <IoCloseOutline size={25} />
           </button>
