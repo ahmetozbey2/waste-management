@@ -2,8 +2,12 @@
 
 import * as React from 'react';
 import { BsFilterLeft } from 'react-icons/bs';
-import { CiCircleList } from 'react-icons/ci';
+import { CiCalendarDate, CiCircleList } from 'react-icons/ci';
 import { IoIosHeartEmpty, IoIosSearch } from 'react-icons/io';
+import { LuMapPin, LuShield } from 'react-icons/lu';
+import { MdOutlinePayments } from 'react-icons/md';
+import { PiTruckLight } from 'react-icons/pi';
+import { RiDeleteBin5Line } from 'react-icons/ri';
 
 import { useFavoritesStore } from '../../store/favoritesState';
 import { useFilterStore } from '../../store/filtersState';
@@ -12,50 +16,51 @@ import AvatarContainer from './components/avatarContainer';
 import Card from './components/card';
 import { DetailModal } from './components/detailModal';
 import Filter from './components/filter';
-import type { AvatarProps, SkipDetails } from './helpers/types';
+import SteppedProgress from './components/steppedProgress';
+import type { AvatarProps, SkipDetails, Step } from './helpers/types';
 import { useSkipsByLocation } from './helpers/useSkipByLocation';
 
+const avatars: Array<AvatarProps> = [
+  {
+    imageSrc: 'https://icon-library.com/images/avatar-icon-images/avatar-icon-images-4.jpg',
+    fallback: '',
+  },
+  {
+    imageSrc: 'https://icon-library.com/images/avatar-icon-images/avatar-icon-images-6.jpg',
+    fallback: '',
+  },
+  {
+    imageSrc: 'https://cdn1.iconfinder.com/data/icons/avatars-1-5/136/87-512.png',
+    fallback: '',
+  },
+  {
+    imageSrc: 'https://www.svgrepo.com/show/382106/male-avatar-boy-face-man-user-9.svg',
+    fallback: '',
+  },
+  {
+    imageSrc:
+      'https://static.vecteezy.com/system/resources/previews/019/896/012/non_2x/female-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png',
+    fallback: '',
+  },
+  {
+    imageSrc:
+      'https://img.freepik.com/premium-vector/man-avatar-profile-picture-isolated-background-avatar-profile-picture-man_1293239-4841.jpg',
+    fallback: '',
+  },
+  {
+    imageSrc: 'https://icon-library.com/images/avatar-icon-images/avatar-icon-images-5.jpg',
+    fallback: '',
+  },
+];
 export default function HomepageView() {
-  const { data, isLoading, error } = useSkipsByLocation('NR32', 'Lowestoft');
-  console.log('data', data);
+  const { data, isLoading } = useSkipsByLocation('NR32', 'Lowestoft');
+
   const [hasHydrated, setHasHydrated] = React.useState(false);
   React.useEffect(() => {
     setHasHydrated(true);
   }, []);
-  const avatars: Array<AvatarProps> = [
-    {
-      imageSrc: 'https://icon-library.com/images/avatar-icon-images/avatar-icon-images-4.jpg',
-      fallback: '',
-    },
-    {
-      imageSrc: 'https://icon-library.com/images/avatar-icon-images/avatar-icon-images-6.jpg',
-      fallback: '',
-    },
-    {
-      imageSrc: 'https://cdn1.iconfinder.com/data/icons/avatars-1-5/136/87-512.png',
-      fallback: '',
-    },
-    {
-      imageSrc: 'https://www.svgrepo.com/show/382106/male-avatar-boy-face-man-user-9.svg',
-      fallback: '',
-    },
-    {
-      imageSrc:
-        'https://static.vecteezy.com/system/resources/previews/019/896/012/non_2x/female-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png',
-      fallback: '',
-    },
-    {
-      imageSrc:
-        'https://img.freepik.com/premium-vector/man-avatar-profile-picture-isolated-background-avatar-profile-picture-man_1293239-4841.jpg',
-      fallback: '',
-    },
-    {
-      imageSrc: 'https://icon-library.com/images/avatar-icon-images/avatar-icon-images-5.jpg',
-      fallback: '',
-    },
-  ];
 
-  const customSkipDetail = {
+  const customSkipDetail: SkipDetails = {
     id: 0,
     size: 40,
     hire_period_days: 14,
@@ -124,9 +129,37 @@ export default function HomepageView() {
     setSelectedSkipData(skipData);
     setShowDrawer(true);
   };
-
+  const currentStep = 2;
+  const steps: Array<Step> = [
+    {
+      name: 'Postcode',
+      icon: <LuMapPin size={30} className={`w-10 ${currentStep >= 0 && 'text-blue-700'}`} />,
+    },
+    {
+      name: 'Waste Type',
+      icon: <RiDeleteBin5Line size={30} className={`w-14 ${currentStep >= 1 && 'fill-blue-700'}`} />,
+    },
+    {
+      name: 'Select Skip',
+      icon: <PiTruckLight size={30} className={`w-14 ${currentStep >= 2 && 'fill-blue-700'}`} />,
+    },
+    {
+      name: 'Permit Check',
+      icon: <LuShield size={35} className={`w-14 ${currentStep >= 3 ? 'fill-blue-700' : 'text-gray-500'}`} />,
+    },
+    {
+      name: 'Choose Data',
+      icon: <CiCalendarDate size={30} className={`w-14 ${currentStep >= 4 ? 'fill-blue-700' : 'text-gray-500'}`} />,
+    },
+    {
+      name: 'Payment',
+      icon: <MdOutlinePayments size={20} className={` ${currentStep >= 5 ? 'fill-blue-700' : 'text-gray-400'}`} />,
+    },
+  ];
   return (
-    <div className="container mx-auto px-4 pt-20">
+    <div className="container mx-auto px-4 pt-12">
+      <SteppedProgress steps={steps} activeStep={2} />
+
       <div className="mb-8 w-full md:w-4/5 lg:w-3/5">
         <h1 className="mb-3 text-3xl leading-tight md:text-[40px] md:leading-[45px]">
           Choose your preferred skip size now
