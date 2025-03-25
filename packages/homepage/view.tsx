@@ -12,6 +12,40 @@ import Filter from './components/filter';
 import type { AvatarProps, SkipDetails } from './helpers/types';
 
 export default function HomepageView() {
+  type ActionType =
+    | { type: 'TOGGLE_FILTER_SECTION' }
+    | { type: 'SET_PRIVATE_VAL'; payload: boolean }
+    | { type: 'SET_IS_ALLOWED'; payload: boolean }
+    | { type: 'SET_MIN_VALUE'; payload: number }
+    | { type: 'SET_MAX_VALUE'; payload: number };
+
+  // Initial state interface
+  interface HomepageState {
+    isFilterSectionOpen: boolean;
+    privateVal: boolean;
+    isAllowed: boolean;
+    minValue: number;
+    maxValue: number;
+  }
+
+  // Reducer function
+  function homepageReducer(state: HomepageState, action: ActionType): HomepageState {
+    switch (action.type) {
+      case 'TOGGLE_FILTER_SECTION':
+        return { ...state, isFilterSectionOpen: !state.isFilterSectionOpen };
+      case 'SET_PRIVATE_VAL':
+        return { ...state, privateVal: action.payload };
+      case 'SET_IS_ALLOWED':
+        return { ...state, isAllowed: action.payload };
+      case 'SET_MIN_VALUE':
+        return { ...state, minValue: action.payload };
+      case 'SET_MAX_VALUE':
+        return { ...state, maxValue: action.payload };
+      default:
+        return state;
+    }
+  }
+
   const avatars: Array<AvatarProps> = [
     {
       imageSrc: 'https://icon-library.com/images/avatar-icon-images/avatar-icon-images-4.jpg',
@@ -209,29 +243,23 @@ export default function HomepageView() {
     allows_heavy_waste: false,
   };
 
-  const [selectedSkipData, setSelectedSkipData] = React.useState<SkipDetails>(sampleData[0]);
-
   const [showModal, setShowModal] = React.useState(false);
-  const [isFilterSectionOpen, setIsSectionFilterOpen] = React.useState(true);
   const [showDrawer, setShowDrawer] = React.useState(false);
-  const onClickViewDetails = (skipData: SkipDetails) => {
-    setSelectedSkipData(skipData);
-    setShowModal(true);
-  };
-
-  const onSelectCard = (skipData: SkipDetails) => {
-    setSelectedSkipData(skipData);
-    setShowDrawer(true);
-  };
-
-  const [privateVal, setPrivateVal] = React.useState(false);
-  const [isAllowed, setIsAllowed] = React.useState(false);
-  const [minValue, setMinValue] = React.useState(0);
-  const [maxValue, setMaxValue] = React.useState(0);
+  const [isFilterSectionOpen, setIsSectionFilterOpen] = React.useState(true);
   const [searchTerm, setSearchTerm] = React.useState('');
+  const [selectedSkipData, setSelectedSkipData] = React.useState<SkipDetails>(sampleData[0]);
+  const [openedSkipData, setOpenedSkipData] = React.useState<SkipDetails>(sampleData[0]);
+  const initialState: HomepageState = {
+    isFilterSectionOpen: true,
+    privateVal: false,
+    isAllowed: false,
+    minValue: 0,
+    maxValue: 0,
+  };
+  const [state, dispatch] = React.useReducer(homepageReducer, initialState);
   const filteredResults = sampleData
-    .filter((data) => data.allows_heavy_waste === privateVal)
-    .filter((data) => data.allowed_on_road === isAllowed)
+    .filter((data) => data.allows_heavy_waste === state.privateVal)
+    .filter((data) => data.allowed_on_road === state.isAllowed)
     .filter((data) => {
       const lowerSearch = searchTerm.toLowerCase();
       return (
@@ -241,7 +269,15 @@ export default function HomepageView() {
         data.size.toString().includes(lowerSearch)
       );
     });
+  const onClickViewDetails = (skipData: SkipDetails) => {
+    setOpenedSkipData(skipData);
+    setShowModal(true);
+  };
 
+  const onSelectCard = (skipData: SkipDetails) => {
+    setSelectedSkipData(skipData);
+    setShowDrawer(true);
+  };
   return (
     <div className="container mx-auto px-4 pt-20">
       <div className="mb-8 w-full md:w-4/5 lg:w-3/5">
@@ -268,15 +304,35 @@ export default function HomepageView() {
         </div>
         {isFilterSectionOpen && (
           <Filter
-            isAllowed={isAllowed}
-            setIsAllowed={setIsAllowed}
-            privateVal={privateVal}
-            onPrivateValChange={setPrivateVal}
+            isAllowed={state.isAllowed}
+            setIsAllowed={(val) =>
+              dispatch({
+                type: 'SET_IS_ALLOWED',
+                payload: typeof val === 'function' ? val(state.isAllowed) : val,
+              })
+            }
+            privateVal={state.privateVal}
+            onPrivateValChange={(val) =>
+              dispatch({
+                type: 'SET_PRIVATE_VAL',
+                payload: typeof val === 'function' ? val(state.privateVal) : val,
+              })
+            }
+            minValue={state.minValue}
+            setMinValue={(val) =>
+              dispatch({
+                type: 'SET_MIN_VALUE',
+                payload: typeof val === 'function' ? val(state.minValue) : val,
+              })
+            }
+            maxValue={state.maxValue}
+            setMaxValue={(val) =>
+              dispatch({
+                type: 'SET_MAX_VALUE',
+                payload: typeof val === 'function' ? val(state.maxValue) : val,
+              })
+            }
             className="animate-slideTop sm:hidden"
-            minValue={minValue}
-            setMinValue={setMinValue}
-            maxValue={maxValue}
-            setMaxValue={setMaxValue}
           />
         )}
         <div className="flex w-full flex-col space-y-4 md:w-1/2 md:flex-row md:justify-between md:space-y-0 lg:w-3/4">
@@ -309,15 +365,35 @@ export default function HomepageView() {
       <div className="flex flex-col items-start sm:space-y-10 lg:flex-row lg:space-x-10 lg:space-y-0">
         {isFilterSectionOpen && (
           <Filter
-            isAllowed={isAllowed}
-            setIsAllowed={setIsAllowed}
-            privateVal={privateVal}
-            onPrivateValChange={setPrivateVal}
-            minValue={minValue}
-            setMinValue={setMinValue}
-            maxValue={maxValue}
-            setMaxValue={setMaxValue}
-            className="w-full max-sm:hidden lg:w-1/4"
+            isAllowed={state.isAllowed}
+            setIsAllowed={(val) =>
+              dispatch({
+                type: 'SET_IS_ALLOWED',
+                payload: typeof val === 'function' ? val(state.isAllowed) : val,
+              })
+            }
+            privateVal={state.privateVal}
+            onPrivateValChange={(val) =>
+              dispatch({
+                type: 'SET_PRIVATE_VAL',
+                payload: typeof val === 'function' ? val(state.privateVal) : val,
+              })
+            }
+            minValue={state.minValue}
+            setMinValue={(val) =>
+              dispatch({
+                type: 'SET_MIN_VALUE',
+                payload: typeof val === 'function' ? val(state.minValue) : val,
+              })
+            }
+            maxValue={state.maxValue}
+            setMaxValue={(val) =>
+              dispatch({
+                type: 'SET_MAX_VALUE',
+                payload: typeof val === 'function' ? val(state.maxValue) : val,
+              })
+            }
+            className="animate-slideTop max-sm:hidden"
           />
         )}
 
@@ -346,10 +422,11 @@ export default function HomepageView() {
         </div>
 
         <DetailModal
-          skipDetails={selectedSkipData}
+          skipDetails={openedSkipData}
           tags={['Waste Logistics', 'Transport']}
           showModal={showModal}
           setShowModal={setShowModal}
+          onSelect={() => onSelectCard(openedSkipData)}
         />
       </div>
       {showDrawer && (
@@ -360,7 +437,9 @@ export default function HomepageView() {
               <p>per week</p>
             </div>
             <div className="flex items-center gap-4">
-              <button className="rounded-md bg-sky-950 px-4 py-2 text-sm text-white duration-300 hover:bg-sky-900">
+              <button
+                onClick={() => setShowDrawer(false)}
+                className="rounded-md bg-sky-950 px-4 py-2 text-sm text-white duration-300 hover:bg-sky-900">
                 Back
               </button>
               <button className="rounded-md border border-solid border-gray-400 px-4 py-2 text-sm duration-300 hover:bg-gray-200">

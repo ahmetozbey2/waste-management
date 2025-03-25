@@ -16,8 +16,9 @@ interface DetailModalProps {
   skipDetails: Pick<SkipDetails, 'id' | 'size' | 'price_before_vat'>;
   showModal: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
+  onSelect: () => void;
 }
-export function DetailModal({ skipDetails, tags, showModal, setShowModal }: DetailModalProps) {
+export function DetailModal({ skipDetails, tags, showModal, setShowModal, onSelect }: DetailModalProps) {
   return (
     <Dialog open={showModal}>
       <DialogContent
@@ -77,7 +78,9 @@ export function DetailModal({ skipDetails, tags, showModal, setShowModal }: Deta
             <PiShippingContainer size={30} />
             <p>Get notified when skips are available near you</p>{' '}
           </div>
-          <button className="mt-5 w-fit rounded-md bg-sky-950 px-8 py-3 text-sm text-white duration-300 hover:bg-sky-900">
+          <button
+            onClick={onSelect}
+            className="mt-5 w-fit rounded-md bg-sky-950 px-8 py-3 text-sm text-white duration-300 hover:bg-sky-900">
             Select
           </button>
         </div>
