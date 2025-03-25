@@ -10,8 +10,8 @@ import { RangeInputRow } from './rangeInputRow';
 
 export interface FilterProps {
   className?: string;
-  privateVal: boolean;
-  onPrivateValChange: React.Dispatch<React.SetStateAction<boolean>>;
+  allows_heavy_waste: boolean;
+  onAllowsHeavyWasteValChange: React.Dispatch<React.SetStateAction<boolean>>;
   isAllowed: boolean;
   setIsAllowed: React.Dispatch<React.SetStateAction<boolean>>;
   minValue: number;
@@ -29,8 +29,8 @@ export default function Filter({
   maxValue,
   setMaxValue,
   className,
-  privateVal,
-  onPrivateValChange,
+  allows_heavy_waste,
+  onAllowsHeavyWasteValChange,
   isAllowed,
   setIsAllowed,
 }: FilterProps) {
@@ -47,8 +47,8 @@ export default function Filter({
       <CheckboxRow
         label="Private Property Only"
         icon={<BsShieldLock size={25} />}
-        checked={privateVal}
-        onChange={onPrivateValChange}
+        checked={allows_heavy_waste}
+        onChange={onAllowsHeavyWasteValChange}
       />
       <RangeInputRow
         minValue={minValue}

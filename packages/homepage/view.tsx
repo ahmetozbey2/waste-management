@@ -13,30 +13,26 @@ import type { AvatarProps, SkipDetails } from './helpers/types';
 
 export default function HomepageView() {
   type ActionType =
-    | { type: 'TOGGLE_FILTER_SECTION' }
-    | { type: 'SET_PRIVATE_VAL'; payload: boolean }
-    | { type: 'SET_IS_ALLOWED'; payload: boolean }
+    | { type: 'SET_ALLOWS_HEAVY_WASTE_VAL'; payload: boolean }
+    | { type: 'SET_ALLOWED_ON_ROAD'; payload: boolean }
     | { type: 'SET_MIN_VALUE'; payload: number }
     | { type: 'SET_MAX_VALUE'; payload: number };
 
   // Initial state interface
-  interface HomepageState {
-    isFilterSectionOpen: boolean;
-    privateVal: boolean;
-    isAllowed: boolean;
+  interface FilterState {
+    allows_heavy_waste: boolean;
+    allowed_on_road: boolean;
     minValue: number;
     maxValue: number;
   }
 
   // Reducer function
-  function homepageReducer(state: HomepageState, action: ActionType): HomepageState {
+  function filterReducer(state: FilterState, action: ActionType): FilterState {
     switch (action.type) {
-      case 'TOGGLE_FILTER_SECTION':
-        return { ...state, isFilterSectionOpen: !state.isFilterSectionOpen };
-      case 'SET_PRIVATE_VAL':
-        return { ...state, privateVal: action.payload };
-      case 'SET_IS_ALLOWED':
-        return { ...state, isAllowed: action.payload };
+      case 'SET_ALLOWS_HEAVY_WASTE_VAL':
+        return { ...state, allows_heavy_waste: action.payload };
+      case 'SET_ALLOWED_ON_ROAD':
+        return { ...state, allowed_on_road: action.payload };
       case 'SET_MIN_VALUE':
         return { ...state, minValue: action.payload };
       case 'SET_MAX_VALUE':
@@ -249,17 +245,28 @@ export default function HomepageView() {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedSkipData, setSelectedSkipData] = React.useState<SkipDetails>(sampleData[0]);
   const [openedSkipData, setOpenedSkipData] = React.useState<SkipDetails>(sampleData[0]);
-  const initialState: HomepageState = {
-    isFilterSectionOpen: true,
-    privateVal: false,
-    isAllowed: false,
+  const initialState: FilterState = {
+    allows_heavy_waste: false,
+    allowed_on_road: false,
     minValue: 0,
     maxValue: 0,
   };
-  const [state, dispatch] = React.useReducer(homepageReducer, initialState);
+  const [state, dispatch] = React.useReducer(filterReducer, initialState);
   const filteredResults = sampleData
-    .filter((data) => data.allows_heavy_waste === state.privateVal)
-    .filter((data) => data.allowed_on_road === state.isAllowed)
+    .filter((data) => {
+      // allows_heavy_waste sadece true ise filtre uygula
+      return state.allows_heavy_waste ? data.allows_heavy_waste === true : true;
+    })
+    .filter((data) => {
+      // isAllowed sadece true ise filtre uygula
+      return state.allowed_on_road ? data.allowed_on_road === true : true;
+    })
+    .filter((data) => {
+      return state.minValue ? data.size > state.minValue : true;
+    })
+    .filter((data) => {
+      return state.maxValue ? data.size < state.maxValue : true;
+    })
     .filter((data) => {
       const lowerSearch = searchTerm.toLowerCase();
       return (
@@ -300,22 +307,24 @@ export default function HomepageView() {
             <BsFilterLeft size={20} />
           </div>
 
-          <p className="text-sm">34 of 43 products</p>
+          <p className="text-sm">
+            {filteredResults.length} of {sampleData.length} products
+          </p>
         </div>
         {isFilterSectionOpen && (
           <Filter
-            isAllowed={state.isAllowed}
+            isAllowed={state.allowed_on_road}
             setIsAllowed={(val) =>
               dispatch({
-                type: 'SET_IS_ALLOWED',
-                payload: typeof val === 'function' ? val(state.isAllowed) : val,
+                type: 'SET_ALLOWED_ON_ROAD',
+                payload: typeof val === 'function' ? val(state.allowed_on_road) : val,
               })
             }
-            privateVal={state.privateVal}
-            onPrivateValChange={(val) =>
+            allows_heavy_waste={state.allows_heavy_waste}
+            onAllowsHeavyWasteValChange={(val) =>
               dispatch({
-                type: 'SET_PRIVATE_VAL',
-                payload: typeof val === 'function' ? val(state.privateVal) : val,
+                type: 'SET_ALLOWS_HEAVY_WASTE_VAL',
+                payload: typeof val === 'function' ? val(state.allows_heavy_waste) : val,
               })
             }
             minValue={state.minValue}
@@ -365,18 +374,18 @@ export default function HomepageView() {
       <div className="flex flex-col items-start sm:space-y-10 lg:flex-row lg:space-x-10 lg:space-y-0">
         {isFilterSectionOpen && (
           <Filter
-            isAllowed={state.isAllowed}
+            isAllowed={state.allowed_on_road}
             setIsAllowed={(val) =>
               dispatch({
-                type: 'SET_IS_ALLOWED',
-                payload: typeof val === 'function' ? val(state.isAllowed) : val,
+                type: 'SET_ALLOWED_ON_ROAD',
+                payload: typeof val === 'function' ? val(state.allowed_on_road) : val,
               })
             }
-            privateVal={state.privateVal}
-            onPrivateValChange={(val) =>
+            allows_heavy_waste={state.allows_heavy_waste}
+            onAllowsHeavyWasteValChange={(val) =>
               dispatch({
-                type: 'SET_PRIVATE_VAL',
-                payload: typeof val === 'function' ? val(state.privateVal) : val,
+                type: 'SET_ALLOWS_HEAVY_WASTE_VAL',
+                payload: typeof val === 'function' ? val(state.allows_heavy_waste) : val,
               })
             }
             minValue={state.minValue}
