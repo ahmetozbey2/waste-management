@@ -13,12 +13,15 @@ import type { SkipDetails } from '../helpers/types';
 
 interface DetailModalProps {
   tags: Array<string>;
-  skipDetails: Pick<SkipDetails, 'id' | 'size' | 'price_before_vat'>;
+  skipDetails: Pick<SkipDetails, 'id' | 'size' | 'price_before_vat'> | null;
   showModal: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
   onSelect: () => void;
 }
 export function DetailModal({ skipDetails, tags, showModal, setShowModal, onSelect }: DetailModalProps) {
+  if (!skipDetails) {
+    return;
+  }
   return (
     <Dialog open={showModal}>
       <DialogContent
@@ -39,7 +42,7 @@ export function DetailModal({ skipDetails, tags, showModal, setShowModal, onSele
                 })}
               </div>
 
-              <h1 className="text-xl">{skipDetails.id != 0 ? skipDetails.size : 'Custom'} Skip</h1>
+              <h1 className="text-xl">{skipDetails?.id != 0 ? skipDetails?.size : 'Custom'} Skip</h1>
             </div>
           </div>
           {skipDetails.id != 0 && (

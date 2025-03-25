@@ -13,154 +13,15 @@ import Card from './components/card';
 import { DetailModal } from './components/detailModal';
 import Filter from './components/filter';
 import type { AvatarProps, SkipDetails } from './helpers/types';
+import { useSkipsByLocation } from './helpers/useSkipByLocation';
 
-const sampleData = [
-  {
-    id: 11554,
-    size: 4,
-    hire_period_days: 14,
-    transport_cost: null,
-    per_tonne_cost: null,
-    price_before_vat: 311,
-    vat: 20,
-    postcode: 'NR32',
-    area: null,
-    forbidden: false,
-    created_at: '2021-04-06T17:04:42',
-    updated_at: '2024-04-02T09:22:38',
-    allowed_on_road: true,
-    allows_heavy_waste: true,
-  },
-  {
-    id: 11555,
-    size: 6,
-    hire_period_days: 14,
-    transport_cost: null,
-    per_tonne_cost: null,
-    price_before_vat: 342,
-    vat: 20,
-    postcode: 'NR32',
-    area: null,
-    forbidden: false,
-    created_at: '2021-04-06T17:04:42',
-    updated_at: '2024-04-02T09:22:38',
-    allowed_on_road: true,
-    allows_heavy_waste: true,
-  },
-  {
-    id: 11556,
-    size: 8,
-    hire_period_days: 14,
-    transport_cost: null,
-    per_tonne_cost: null,
-    price_before_vat: 420,
-    vat: 20,
-    postcode: 'NR32',
-    area: null,
-    forbidden: false,
-    created_at: '2021-04-06T17:04:42',
-    updated_at: '2024-04-02T09:22:38',
-    allowed_on_road: true,
-    allows_heavy_waste: true,
-  },
-  {
-    id: 11557,
-    size: 10,
-    hire_period_days: 14,
-    transport_cost: null,
-    per_tonne_cost: null,
-    price_before_vat: 448,
-    vat: 20,
-    postcode: 'NR32',
-    area: null,
-    forbidden: false,
-    created_at: '2021-04-06T17:04:42',
-    updated_at: '2024-04-02T09:22:38',
-    allowed_on_road: false,
-    allows_heavy_waste: false,
-  },
-  {
-    id: 11558,
-    size: 12,
-    hire_period_days: 14,
-    transport_cost: null,
-    per_tonne_cost: null,
-    price_before_vat: 491,
-    vat: 20,
-    postcode: 'NR32',
-    area: null,
-    forbidden: false,
-    created_at: '2021-04-06T17:04:42',
-    updated_at: '2024-04-02T09:22:38',
-    allowed_on_road: false,
-    allows_heavy_waste: false,
-  },
-  {
-    id: 11559,
-    size: 14,
-    hire_period_days: 14,
-    transport_cost: null,
-    per_tonne_cost: null,
-    price_before_vat: 527,
-    vat: 20,
-    postcode: 'NR32',
-    area: null,
-    forbidden: false,
-    created_at: '2021-04-06T17:04:42',
-    updated_at: '2024-04-02T09:22:38',
-    allowed_on_road: false,
-    allows_heavy_waste: false,
-  },
-  {
-    id: 11560,
-    size: 16,
-    hire_period_days: 14,
-    transport_cost: null,
-    per_tonne_cost: null,
-    price_before_vat: 556,
-    vat: 20,
-    postcode: 'NR32',
-    area: null,
-    forbidden: false,
-    created_at: '2021-04-06T17:04:42',
-    updated_at: '2024-04-02T09:22:38',
-    allowed_on_road: false,
-    allows_heavy_waste: false,
-  },
-  {
-    id: 11561,
-    size: 20,
-    hire_period_days: 14,
-    transport_cost: 236,
-    per_tonne_cost: 236,
-    price_before_vat: 944,
-    vat: 20,
-    postcode: 'NR32',
-    area: null,
-    forbidden: false,
-    created_at: '2021-04-06T17:04:42',
-    updated_at: '2024-04-02T09:22:38',
-    allowed_on_road: false,
-    allows_heavy_waste: true,
-  },
-  {
-    id: 11562,
-    size: 40,
-    hire_period_days: 14,
-    transport_cost: 236,
-    per_tonne_cost: 236,
-    price_before_vat: 944,
-    vat: 20,
-    postcode: 'NR32',
-    area: null,
-    forbidden: false,
-    created_at: '2021-04-06T17:04:42',
-    updated_at: '2024-04-02T09:22:38',
-    allowed_on_road: false,
-    allows_heavy_waste: false,
-  },
-];
 export default function HomepageView() {
+  const { data, isLoading, error } = useSkipsByLocation('NR32', 'Lowestoft');
+  console.log('data', data);
+  const [hasHydrated, setHasHydrated] = React.useState(false);
+  React.useEffect(() => {
+    setHasHydrated(true);
+  }, []);
   const avatars: Array<AvatarProps> = [
     {
       imageSrc: 'https://icon-library.com/images/avatar-icon-images/avatar-icon-images-4.jpg',
@@ -215,8 +76,8 @@ export default function HomepageView() {
   const [showDrawer, setShowDrawer] = React.useState(false);
   const [isFilterSectionOpen, setIsSectionFilterOpen] = React.useState(true);
   const [searchTerm, setSearchTerm] = React.useState('');
-  const [selectedSkipData, setSelectedSkipData] = React.useState<SkipDetails>(sampleData[0]);
-  const [openedSkipData, setOpenedSkipData] = React.useState<SkipDetails>(sampleData[0]);
+  const [selectedSkipData, setSelectedSkipData] = React.useState<SkipDetails | null>(null);
+  const [openedSkipData, setOpenedSkipData] = React.useState<SkipDetails | null>(null);
 
   const { viewState, setViewState } = useViewState();
   const {
@@ -229,27 +90,29 @@ export default function HomepageView() {
     setMinValue,
     setMaxValue,
   } = useFilterStore();
-  const [filteredResults, setFilteredResults] = React.useState<SkipDetails[]>(sampleData);
+  const [filteredResults, setFilteredResults] = React.useState<SkipDetails[] | null>(null);
   const [isFavoriteSelected, setIsFavoriteSelected] = React.useState(false);
   const { favorites } = useFavoritesStore();
   React.useEffect(() => {
-    const results = sampleData
-      .filter((data) => (allows_heavy_waste ? data.allows_heavy_waste === true : true))
-      .filter((data) => (allowed_on_road ? data.allowed_on_road === true : true))
-      .filter((data) => (minValue ? data.size >= minValue : true))
-      .filter((data) => (maxValue ? data.size <= maxValue : true))
-      .filter((data) => (isFavoriteSelected ? favorites.some((fav) => fav.id === data.id) : true))
-      .filter((data) => {
+    if (!data) return;
+    const results = data
+      .filter((d) => (allows_heavy_waste ? d.allows_heavy_waste === true : true))
+      .filter((d) => (allowed_on_road ? d.allowed_on_road === true : true))
+      .filter((d) => (minValue ? d.size >= minValue : true))
+      .filter((d) => (maxValue ? d.size <= maxValue : true))
+      .filter((d) => (isFavoriteSelected ? favorites.some((fav) => fav.id === d.id) : true))
+      .filter((d) => {
         const lowerSearch = searchTerm.toLowerCase();
         return (
-          data.postcode?.toLowerCase().includes(lowerSearch) ||
-          data.size.toString().includes(lowerSearch) ||
-          data.price_before_vat.toString().includes(lowerSearch)
+          d.postcode?.toLowerCase().includes(lowerSearch) ||
+          d.size.toString().includes(lowerSearch) ||
+          d.price_before_vat.toString().includes(lowerSearch)
         );
       });
-
     setFilteredResults(results);
-  }, [searchTerm, isFavoriteSelected, favorites, sampleData, allowed_on_road, allows_heavy_waste, minValue, maxValue]);
+    setSelectedSkipData(results[0] || null);
+    setOpenedSkipData(results[0] || null);
+  }, [searchTerm, isFavoriteSelected, favorites, data, allowed_on_road, allows_heavy_waste, minValue, maxValue]);
 
   const onClickViewDetails = (skipData: SkipDetails) => {
     setShowDrawer(false);
@@ -261,12 +124,6 @@ export default function HomepageView() {
     setSelectedSkipData(skipData);
     setShowDrawer(true);
   };
-
-  const [hasHydrated, setHasHydrated] = React.useState(false);
-
-  React.useEffect(() => {
-    setHasHydrated(true);
-  }, []);
 
   return (
     <div className="container mx-auto px-4 pt-20">
@@ -291,7 +148,7 @@ export default function HomepageView() {
           </div>
 
           <p className="text-sm">
-            {filteredResults.length} of {sampleData.length} products
+            {filteredResults?.length} of {data?.length} products
           </p>
         </div>
         {isFilterSectionOpen && hasHydrated && (
@@ -352,45 +209,47 @@ export default function HomepageView() {
             className="animate-slideTop max-sm:hidden"
           />
         )}
-
-        <div className={`flex w-full pb-40 ${isFilterSectionOpen ? 'lg:w-3/4' : 'lg:w-full'} `}>
-          <div
-            className={`flex w-full ${viewState == 'Grid' ? 'grid-cols-1 gap-4 max-sm:flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3' : 'flex-col gap-y-2'} `}>
-            {hasHydrated && (
-              <Card
-                description="Book online with transparent pricing and assured loading every time."
-                tags={['Waste Logistics', 'Transport', 'Intermodal Waste Logistics']}
-                hasImage
-                skipDetails={customSkipDetail}
-                onClickViewDetails={() => onClickViewDetails(customSkipDetail)}
-                onSelect={() => onSelectCard(customSkipDetail)}
-                data={customSkipDetail}
-                viewType={viewState}
-              />
-            )}
-            {hasHydrated &&
-              filteredResults.map((data, i) => (
+        {!data || isLoading ? (
+          <div />
+        ) : (
+          <div className={`flex w-full animate-slideTop pb-40 ${isFilterSectionOpen ? 'lg:w-3/4' : 'lg:w-full'} `}>
+            <div
+              className={`flex w-full ${viewState == 'Grid' ? 'grid-cols-1 gap-4 max-sm:flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3' : 'flex-col gap-y-2'} `}>
+              {hasHydrated && (
                 <Card
-                  key={data.id || i}
                   description="Book online with transparent pricing and assured loading every time."
-                  tags={['Waste Logistics', 'Transport']}
-                  hasImage={false}
-                  skipDetails={data}
-                  onClickViewDetails={() => onClickViewDetails(data)}
-                  onSelect={() => onSelectCard(data)}
-                  data={data}
+                  tags={['Waste Logistics', 'Transport', 'Intermodal Waste Logistics']}
+                  hasImage
+                  skipDetails={customSkipDetail}
+                  onClickViewDetails={() => onClickViewDetails(customSkipDetail)}
+                  onSelect={() => onSelectCard(customSkipDetail)}
+                  data={customSkipDetail}
                   viewType={viewState}
                 />
-              ))}
+              )}
+              {hasHydrated &&
+                filteredResults?.map((data, i) => (
+                  <Card
+                    key={data.id || i}
+                    description="Book online with transparent pricing and assured loading every time."
+                    tags={['Waste Logistics', 'Transport']}
+                    hasImage={false}
+                    skipDetails={data}
+                    onClickViewDetails={() => onClickViewDetails(data)}
+                    onSelect={() => onSelectCard(data)}
+                    data={data}
+                    viewType={viewState}
+                  />
+                ))}
+            </div>
           </div>
-        </div>
-
+        )}
         <DetailModal
-          skipDetails={openedSkipData}
+          skipDetails={openedSkipData as SkipDetails}
           tags={['Waste Logistics', 'Transport']}
           showModal={showModal}
           setShowModal={setShowModal}
-          onSelect={() => onSelectCard(openedSkipData)}
+          onSelect={() => onSelectCard(openedSkipData as SkipDetails)}
         />
       </div>
       {showDrawer && (
@@ -398,7 +257,7 @@ export default function HomepageView() {
           <div className="container mx-auto flex items-center justify-between max-sm:flex-col max-sm:items-start max-sm:gap-2">
             <div className="flex items-end gap-2">
               <p className="text-3xl font-bold">
-                {selectedSkipData.id != 0 ? `£${selectedSkipData.price_before_vat}` : 'Ask for Price'}
+                {selectedSkipData?.id != 0 ? `£${selectedSkipData?.price_before_vat}` : 'Ask for Price'}
               </p>
               <p>per week</p>
             </div>
