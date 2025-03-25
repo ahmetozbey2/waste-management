@@ -4,7 +4,7 @@ interface CheckboxRowProps {
   label: string;
   icon?: React.ReactNode;
   checked: boolean;
-  onChange: React.Dispatch<React.SetStateAction<boolean>>;
+  onChange: (value: boolean) => void;
 }
 
 /**

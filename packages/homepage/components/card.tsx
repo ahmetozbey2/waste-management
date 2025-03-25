@@ -10,8 +10,9 @@
  */
 import Image from 'next/image';
 import * as React from 'react';
-import { IoIosHeartEmpty } from 'react-icons/io';
+import { IoIosHeart, IoIosHeartEmpty } from 'react-icons/io';
 
+import { useFavoritesStore } from '../../../store/favoritesState';
 import type { SkipDetails } from '../helpers/types';
 
 /**
@@ -39,6 +40,7 @@ export interface CardProps {
   skipDetails: Pick<SkipDetails, 'id' | 'size' | 'price_before_vat'>;
   onClickViewDetails: () => void;
   onSelect: () => void;
+  data: SkipDetails;
 }
 
 /**
@@ -52,7 +54,14 @@ export interface CardProps {
  *
  * @returns A styled card displaying skip details and call-to-action buttons.
  */
-export default function Card({ hasImage, tags, skipDetails, onClickViewDetails, onSelect }: CardProps) {
+export default function Card({ hasImage, tags, skipDetails, onClickViewDetails, onSelect, data }: CardProps) {
+  const { addFavorite, removeFavorite, isFavorite } = useFavoritesStore();
+  const [hasHydrated, setHasHydrated] = React.useState(false);
+
+  React.useEffect(() => {
+    setHasHydrated(true);
+  }, []);
+
   return (
     <div
       className={`${hasImage ? 'col-span-2' : 'col-span-1'} flex items-start gap-4 rounded-xl border border-solid border-gray-400 p-5 max-sm:flex-col`}>
@@ -66,12 +75,15 @@ export default function Card({ hasImage, tags, skipDetails, onClickViewDetails, 
           className="aspect-square w-[45%] rounded-md"
         />
       )}
-
       <div>
         {/* Header section with size and heart icon */}
         <div className="flex justify-between">
           <p className="mb-1 w-fit rounded-full border border-gray-400 px-4 py-1 text-xs">{skipDetails.size} Yards</p>
-          <IoIosHeartEmpty />
+          {hasHydrated && isFavorite(data.id) ? (
+            <IoIosHeart fill="red" className="cursor-pointer" size={25} onClick={() => removeFavorite(data.id)} />
+          ) : (
+            <IoIosHeartEmpty className="cursor-pointer" size={25} onClick={() => addFavorite(data)} />
+          )}
         </div>
 
         {/* Title and subtitle */}

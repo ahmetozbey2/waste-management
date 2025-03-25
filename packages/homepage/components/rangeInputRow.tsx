@@ -4,9 +4,9 @@ interface RangeInputRowProps {
   placeholderMin?: string;
   placeholderMax?: string;
   minValue: number;
-  setMinValue: React.Dispatch<React.SetStateAction<number>>;
+  setMinValue: (value: number) => void;
   maxValue: number;
-  setMaxValue: React.Dispatch<React.SetStateAction<number>>;
+  setMaxValue: (value: number) => void;
 }
 
 /**

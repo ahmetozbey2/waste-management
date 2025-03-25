@@ -5,6 +5,8 @@ import { BsFilterLeft } from 'react-icons/bs';
 import { CiCircleList } from 'react-icons/ci';
 import { IoIosHeartEmpty, IoIosSearch } from 'react-icons/io';
 
+import { useFavoritesStore } from '../../store/favoritesState';
+import { useFilterStore } from '../../store/filtersState';
 import AvatarContainer from './components/avatarContainer';
 import Card from './components/card';
 import { DetailModal } from './components/detailModal';
@@ -12,40 +14,6 @@ import Filter from './components/filter';
 import type { AvatarProps, SkipDetails } from './helpers/types';
 
 export default function HomepageView() {
-  type ActionType =
-    | { type: 'TOGGLE_FILTER_SECTION' }
-    | { type: 'SET_PRIVATE_VAL'; payload: boolean }
-    | { type: 'SET_IS_ALLOWED'; payload: boolean }
-    | { type: 'SET_MIN_VALUE'; payload: number }
-    | { type: 'SET_MAX_VALUE'; payload: number };
-
-  // Initial state interface
-  interface HomepageState {
-    isFilterSectionOpen: boolean;
-    privateVal: boolean;
-    isAllowed: boolean;
-    minValue: number;
-    maxValue: number;
-  }
-
-  // Reducer function
-  function homepageReducer(state: HomepageState, action: ActionType): HomepageState {
-    switch (action.type) {
-      case 'TOGGLE_FILTER_SECTION':
-        return { ...state, isFilterSectionOpen: !state.isFilterSectionOpen };
-      case 'SET_PRIVATE_VAL':
-        return { ...state, privateVal: action.payload };
-      case 'SET_IS_ALLOWED':
-        return { ...state, isAllowed: action.payload };
-      case 'SET_MIN_VALUE':
-        return { ...state, minValue: action.payload };
-      case 'SET_MAX_VALUE':
-        return { ...state, maxValue: action.payload };
-      default:
-        return state;
-    }
-  }
-
   const avatars: Array<AvatarProps> = [
     {
       imageSrc: 'https://icon-library.com/images/avatar-icon-images/avatar-icon-images-4.jpg',
@@ -249,26 +217,39 @@ export default function HomepageView() {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedSkipData, setSelectedSkipData] = React.useState<SkipDetails>(sampleData[0]);
   const [openedSkipData, setOpenedSkipData] = React.useState<SkipDetails>(sampleData[0]);
-  const initialState: HomepageState = {
-    isFilterSectionOpen: true,
-    privateVal: false,
-    isAllowed: false,
-    minValue: 0,
-    maxValue: 0,
-  };
-  const [state, dispatch] = React.useReducer(homepageReducer, initialState);
-  const filteredResults = sampleData
-    .filter((data) => data.allows_heavy_waste === state.privateVal)
-    .filter((data) => data.allowed_on_road === state.isAllowed)
-    .filter((data) => {
-      const lowerSearch = searchTerm.toLowerCase();
-      return (
-        data.postcode?.toLowerCase().includes(lowerSearch) ||
-        data.size.toString().includes(lowerSearch) ||
-        data.price_before_vat.toString().includes(lowerSearch) ||
-        data.size.toString().includes(lowerSearch)
-      );
-    });
+  const {
+    allows_heavy_waste,
+    allowed_on_road,
+    minValue,
+    maxValue,
+    setAllowsHeavyWaste,
+    setAllowedOnRoad,
+    setMinValue,
+    setMaxValue,
+  } = useFilterStore();
+  const [filteredResults, setFilteredResults] = React.useState<SkipDetails[]>(sampleData);
+  const [isFavoriteSelected, setIsFavoriteSelected] = React.useState(false);
+  const { favorites } = useFavoritesStore();
+  React.useEffect(() => {
+    // Normal filtreleme
+    const results = sampleData
+      .filter((data) => (allows_heavy_waste ? data.allows_heavy_waste === true : true))
+      .filter((data) => (allowed_on_road ? data.allowed_on_road === true : true))
+      .filter((data) => (minValue ? data.size > minValue : true))
+      .filter((data) => (maxValue ? data.size < maxValue : true))
+      .filter((data) => (isFavoriteSelected ? favorites.some((fav) => fav.id === data.id) : true))
+      .filter((data) => {
+        const lowerSearch = searchTerm.toLowerCase();
+        return (
+          data.postcode?.toLowerCase().includes(lowerSearch) ||
+          data.size.toString().includes(lowerSearch) ||
+          data.price_before_vat.toString().includes(lowerSearch)
+        );
+      });
+
+    setFilteredResults(results);
+  }, [searchTerm, isFavoriteSelected, favorites, sampleData]);
+
   const onClickViewDetails = (skipData: SkipDetails) => {
     setOpenedSkipData(skipData);
     setShowModal(true);
@@ -278,6 +259,13 @@ export default function HomepageView() {
     setSelectedSkipData(skipData);
     setShowDrawer(true);
   };
+
+  const [hasHydrated, setHasHydrated] = React.useState(false);
+
+  React.useEffect(() => {
+    setHasHydrated(true);
+  }, []);
+
   return (
     <div className="container mx-auto px-4 pt-20">
       <div className="mb-8 w-full md:w-4/5 lg:w-3/5">
@@ -291,7 +279,7 @@ export default function HomepageView() {
         </div>
       </div>
 
-      <div className="bg-orange-60 mb-10 flex flex-col space-y-4 lg:flex-row lg:items-center lg:space-x-10 lg:space-y-0">
+      <div className="mb-10 flex flex-col space-y-4 lg:flex-row lg:items-center lg:space-x-10 lg:space-y-0">
         <div className="flex w-full items-center space-x-4 md:w-1/2 lg:w-1/4">
           <div
             onClick={() => setIsSectionFilterOpen((prev) => !prev)}
@@ -300,38 +288,20 @@ export default function HomepageView() {
             <BsFilterLeft size={20} />
           </div>
 
-          <p className="text-sm">34 of 43 products</p>
+          <p className="text-sm">
+            {filteredResults.length} of {sampleData.length} products
+          </p>
         </div>
         {isFilterSectionOpen && (
           <Filter
-            isAllowed={state.isAllowed}
-            setIsAllowed={(val) =>
-              dispatch({
-                type: 'SET_IS_ALLOWED',
-                payload: typeof val === 'function' ? val(state.isAllowed) : val,
-              })
-            }
-            privateVal={state.privateVal}
-            onPrivateValChange={(val) =>
-              dispatch({
-                type: 'SET_PRIVATE_VAL',
-                payload: typeof val === 'function' ? val(state.privateVal) : val,
-              })
-            }
-            minValue={state.minValue}
-            setMinValue={(val) =>
-              dispatch({
-                type: 'SET_MIN_VALUE',
-                payload: typeof val === 'function' ? val(state.minValue) : val,
-              })
-            }
-            maxValue={state.maxValue}
-            setMaxValue={(val) =>
-              dispatch({
-                type: 'SET_MAX_VALUE',
-                payload: typeof val === 'function' ? val(state.maxValue) : val,
-              })
-            }
+            isAllowed={allowed_on_road}
+            setIsAllowed={setAllowedOnRoad}
+            allows_heavy_waste={allows_heavy_waste}
+            onAllowsHeavyWasteValChange={setAllowsHeavyWaste}
+            minValue={minValue}
+            setMinValue={setMinValue}
+            maxValue={maxValue}
+            setMaxValue={setMaxValue}
             className="animate-slideTop sm:hidden"
           />
         )}
@@ -350,9 +320,11 @@ export default function HomepageView() {
             />
           </div>
           <div className="flex items-center space-x-4 md:space-x-6">
-            <div className="flex cursor-pointer items-center space-x-2 rounded-sm py-2 duration-300 hover:bg-gray-200 sm:px-4">
+            <div
+              className={`flex cursor-pointer items-center space-x-2 rounded-sm py-2 duration-300 hover:bg-gray-200 sm:px-4 ${isFavoriteSelected && 'bg-gray-200'}`}
+              onClick={() => setIsFavoriteSelected((prev) => !prev)}>
               <p className="text-[#353535]">Favourites</p>
-              <IoIosHeartEmpty />
+              <IoIosHeartEmpty className="cursor-pointer" />
             </div>
             <div className="flex cursor-pointer items-center space-x-2 rounded-sm px-4 py-2 duration-300 hover:bg-gray-200">
               <p className="text-[#353535]">List</p>
@@ -365,59 +337,44 @@ export default function HomepageView() {
       <div className="flex flex-col items-start sm:space-y-10 lg:flex-row lg:space-x-10 lg:space-y-0">
         {isFilterSectionOpen && (
           <Filter
-            isAllowed={state.isAllowed}
-            setIsAllowed={(val) =>
-              dispatch({
-                type: 'SET_IS_ALLOWED',
-                payload: typeof val === 'function' ? val(state.isAllowed) : val,
-              })
-            }
-            privateVal={state.privateVal}
-            onPrivateValChange={(val) =>
-              dispatch({
-                type: 'SET_PRIVATE_VAL',
-                payload: typeof val === 'function' ? val(state.privateVal) : val,
-              })
-            }
-            minValue={state.minValue}
-            setMinValue={(val) =>
-              dispatch({
-                type: 'SET_MIN_VALUE',
-                payload: typeof val === 'function' ? val(state.minValue) : val,
-              })
-            }
-            maxValue={state.maxValue}
-            setMaxValue={(val) =>
-              dispatch({
-                type: 'SET_MAX_VALUE',
-                payload: typeof val === 'function' ? val(state.maxValue) : val,
-              })
-            }
+            isAllowed={allowed_on_road}
+            setIsAllowed={setAllowedOnRoad}
+            allows_heavy_waste={allows_heavy_waste}
+            onAllowsHeavyWasteValChange={setAllowsHeavyWaste}
+            minValue={minValue}
+            setMinValue={setMinValue}
+            maxValue={maxValue}
+            setMaxValue={setMaxValue}
             className="animate-slideTop max-sm:hidden"
           />
         )}
 
         <div className={`flex w-full pb-40 ${isFilterSectionOpen ? 'lg:w-3/4' : 'lg:w-full'} `}>
           <div className="flex w-full grid-cols-1 gap-4 max-sm:flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3">
-            <Card
-              description="Book online with transparent pricing and assured loading every time."
-              tags={['Waste Logistics', 'Transport', 'Intermodal Waste Logistics']}
-              hasImage
-              skipDetails={customSkipDetail}
-              onClickViewDetails={() => onClickViewDetails(customSkipDetail)}
-              onSelect={() => onSelectCard(customSkipDetail)}
-            />
-            {filteredResults.map((data, i) => (
+            {hasHydrated && (
               <Card
-                key={data.id || i}
                 description="Book online with transparent pricing and assured loading every time."
-                tags={['Waste Logistics', 'Transport']}
-                hasImage={false}
-                skipDetails={data}
-                onClickViewDetails={() => onClickViewDetails(data)}
-                onSelect={() => onSelectCard(data)}
+                tags={['Waste Logistics', 'Transport', 'Intermodal Waste Logistics']}
+                hasImage
+                skipDetails={customSkipDetail}
+                onClickViewDetails={() => onClickViewDetails(customSkipDetail)}
+                onSelect={() => onSelectCard(customSkipDetail)}
+                data={customSkipDetail}
               />
-            ))}
+            )}
+            {hasHydrated &&
+              filteredResults.map((data, i) => (
+                <Card
+                  key={data.id || i}
+                  description="Book online with transparent pricing and assured loading every time."
+                  tags={['Waste Logistics', 'Transport']}
+                  hasImage={false}
+                  skipDetails={data}
+                  onClickViewDetails={() => onClickViewDetails(data)}
+                  onSelect={() => onSelectCard(data)}
+                  data={data}
+                />
+              ))}
           </div>
         </div>
 

@@ -43,7 +43,7 @@ export function DetailModal({ skipDetails, tags, showModal, setShowModal, onSele
             </div>
           </div>
           <div className="cursor-pointer rounded-md border border-solid border-gray-400 p-[4px]">
-            <IoIosHeartEmpty size={20} />
+            <IoIosHeartEmpty size={20} className="cursor-pointer" />
           </div>
         </div>
 
