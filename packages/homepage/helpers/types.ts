@@ -34,3 +34,8 @@ export interface FilterState {
 }
 
 export type SectionViewType = 'List' | 'Grid';
+
+export interface Step {
+  name: string;
+  icon: React.ReactNode;
+}
