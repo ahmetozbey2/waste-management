@@ -78,7 +78,9 @@ export default function Card({ hasImage, tags, skipDetails, onClickViewDetails, 
       <div>
         {/* Header section with size and heart icon */}
         <div className="flex justify-between">
-          <p className="mb-1 w-fit rounded-full border border-gray-400 px-4 py-1 text-xs">{skipDetails.size} Yards</p>
+          <p className="mb-1 w-fit rounded-full border border-gray-400 px-4 py-1 text-xs">
+            {skipDetails.id != 0 ? skipDetails.size : '40+'} Yards
+          </p>
           {hasHydrated && isFavorite(data.id) ? (
             <IoIosHeart fill="red" className="cursor-pointer" size={25} onClick={() => removeFavorite(data.id)} />
           ) : (
@@ -87,7 +89,7 @@ export default function Card({ hasImage, tags, skipDetails, onClickViewDetails, 
         </div>
 
         {/* Title and subtitle */}
-        <p className="mb-2 text-lg">{skipDetails.size} Yard Skip</p>
+        <p className="mb-2 text-lg">{!hasImage ? skipDetails.size : 'Custom'} Yard Skip</p>
         <p className="mb-2 text-sm">Book online with transparent pricing and assured loading every time.</p>
 
         {/* Tags section */}
@@ -104,7 +106,7 @@ export default function Card({ hasImage, tags, skipDetails, onClickViewDetails, 
 
         {/* Price display */}
         <div className="mb-3 flex items-end space-x-1">
-          <p className="text-2xl font-semibold">£{skipDetails.price_before_vat}</p>
+          <p className="text-2xl font-semibold">{hasImage ? 'Ask For Price ' : `£${skipDetails.price_before_vat}`}</p>
           <p className="mb-1 text-sm">per week</p>
         </div>
 
