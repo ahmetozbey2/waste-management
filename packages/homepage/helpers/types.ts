@@ -32,3 +32,5 @@ export interface FilterState {
   minValue: number;
   maxValue: number;
 }
+
+export type SectionViewType = 'List' | 'Grid';

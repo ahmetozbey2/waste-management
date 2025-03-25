@@ -7,6 +7,7 @@ import { IoIosHeartEmpty, IoIosSearch } from 'react-icons/io';
 
 import { useFavoritesStore } from '../../store/favoritesState';
 import { useFilterStore } from '../../store/filtersState';
+import { useViewState } from '../../store/viewState';
 import AvatarContainer from './components/avatarContainer';
 import Card from './components/card';
 import { DetailModal } from './components/detailModal';
@@ -216,6 +217,8 @@ export default function HomepageView() {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedSkipData, setSelectedSkipData] = React.useState<SkipDetails>(sampleData[0]);
   const [openedSkipData, setOpenedSkipData] = React.useState<SkipDetails>(sampleData[0]);
+
+  const { viewState, setViewState } = useViewState();
   const {
     allows_heavy_waste,
     allowed_on_road,
@@ -278,7 +281,7 @@ export default function HomepageView() {
         </div>
       </div>
 
-      <div className="mb-10 flex flex-col space-y-4 lg:flex-row lg:items-center lg:space-x-10 lg:space-y-0">
+      <div className="mb-10 flex flex-col space-y-4 lg:flex-row lg:items-center  lg:space-y-0">
         <div className="flex w-full items-center space-x-4 md:w-1/2 lg:w-1/4">
           <div
             onClick={() => setIsSectionFilterOpen((prev) => !prev)}
@@ -320,12 +323,14 @@ export default function HomepageView() {
           </div>
           <div className="flex items-center space-x-4 md:space-x-6">
             <div
-              className={`flex cursor-pointer items-center space-x-2 rounded-sm py-2 duration-300 hover:bg-gray-200 sm:px-4 ${isFavoriteSelected && 'bg-gray-200'}`}
+              className={`flex cursor-pointer items-center space-x-2 rounded-sm px-4 py-2 duration-300 hover:bg-gray-200 ${isFavoriteSelected && 'bg-gray-200'}`}
               onClick={() => setIsFavoriteSelected((prev) => !prev)}>
               <p className="text-[#353535]">Favourites</p>
               <IoIosHeartEmpty className="cursor-pointer" />
             </div>
-            <div className="flex cursor-pointer items-center space-x-2 rounded-sm px-4 py-2 duration-300 hover:bg-gray-200">
+            <div
+              onClick={() => setViewState(viewState == 'List' ? 'Grid' : 'List')}
+              className={`flex cursor-pointer items-center space-x-2 rounded-sm px-4 py-2 duration-300 hover:bg-gray-200 ${viewState == 'List' && 'bg-gray-200'}`}>
               <p className="text-[#353535]">List</p>
               <CiCircleList size={20} />
             </div>
@@ -349,7 +354,8 @@ export default function HomepageView() {
         )}
 
         <div className={`flex w-full pb-40 ${isFilterSectionOpen ? 'lg:w-3/4' : 'lg:w-full'} `}>
-          <div className="flex w-full grid-cols-1 gap-4 max-sm:flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3">
+          <div
+            className={`flex w-full ${viewState == 'Grid' ? 'grid-cols-1 gap-4 max-sm:flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3' : 'flex-col gap-y-2'} `}>
             {hasHydrated && (
               <Card
                 description="Book online with transparent pricing and assured loading every time."
@@ -359,6 +365,7 @@ export default function HomepageView() {
                 onClickViewDetails={() => onClickViewDetails(customSkipDetail)}
                 onSelect={() => onSelectCard(customSkipDetail)}
                 data={customSkipDetail}
+                viewType={viewState}
               />
             )}
             {hasHydrated &&
@@ -372,6 +379,7 @@ export default function HomepageView() {
                   onClickViewDetails={() => onClickViewDetails(data)}
                   onSelect={() => onSelectCard(data)}
                   data={data}
+                  viewType={viewState}
                 />
               ))}
           </div>
