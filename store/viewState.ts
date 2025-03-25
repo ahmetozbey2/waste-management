@@ -11,7 +11,7 @@ interface ViewStateStore {
 export const useViewState = create<ViewStateStore>()(
   persist(
     (set) => ({
-      viewState: 'List',
+      viewState: 'Grid',
       setViewState: (state) => set({ viewState: state }),
     }),
     {
